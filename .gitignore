@@ -1,0 +1,7 @@
+uploads/
+database.db
+live_face.jpg
+id_face.jpg
+
+__pycache__/
+*.pyc
