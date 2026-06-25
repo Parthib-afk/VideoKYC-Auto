@@ -1,63 +1,119 @@
 import easyocr
+import re
 
-from document_classifier import classify_document
-
-from field_extractors import (
-    extract_aadhaar,
-    extract_pan,
-    extract_driving_license,
-    extract_passport
-)
-
+# Initialize EasyOCR
 reader = easyocr.Reader(['en'])
 
 
 def extract_text(image_path):
 
-    # OCR
     result = reader.readtext(image_path)
 
-    extracted_lines = []
+    extracted_text = []
 
     for item in result:
-        extracted_lines.append(item[1])
+        extracted_text.append(item[1])
 
-    full_text = "\n".join(extracted_lines)
+    full_text = "\n".join(extracted_text)
 
-    # Detect document type
-    document_type = classify_document(full_text)
+    # -----------------------------
+    # Default Values
+    # -----------------------------
 
-    # Extract fields
-    if document_type == "aadhaar":
+    name = "Not Found"
+    dob = "Not Found"
+    licence_number = "Not Found"
 
-        data = extract_aadhaar(full_text)
+    # -----------------------------
+    # Date of Birth
+    # -----------------------------
 
-    elif document_type == "pan":
+    dob_pattern = r"\d{2}[/-]\d{2}[/-]\d{4}"
 
-        data = extract_pan(full_text)
+    dob_match = re.search(dob_pattern, full_text)
 
-    elif document_type == "driving_license":
+    if dob_match:
+        dob = dob_match.group()
 
-        data = extract_driving_license(full_text)
+    # -----------------------------
+    # Driving Licence Number
+    # -----------------------------
 
-    elif document_type == "passport":
+    licence_pattern = r"[A-Z]{2}\d{2}\s?\d{11}|[A-Z]{2}-\d{2}-\d{11}"
 
-        data = extract_passport(full_text)
+    licence_match = re.search(
+        licence_pattern,
+        full_text.replace("\n", " ")
+    )
 
-    else:
+    if licence_match:
+        licence_number = licence_match.group()
 
-        data = {
-            "document": "Unknown",
-            "name": "Not Found",
-            "dob": "Not Found",
-            "id_number": "Not Found",
-            "address": "Not Found"
-        }
+    # -----------------------------
+    # Guess Name
+    # -----------------------------
 
-    # Add document type
-    data["document"] = document_type
+    ignore_words = [
+        "DRIVING",
+        "LICENCE",
+        "LICENSE",
+        "INDIA",
+        "TRANSPORT",
+        "GOVERNMENT",
+        "DOB",
+        "DL",
+        "VALID",
+        "AUTHORITY",
+        "ADDRESS",
+        "DATE",
+        "BIRTH"
+    ]
 
-    # Add full OCR text
-    data["full_text"] = full_text
+    lines = full_text.split("\n")
 
-    return data
+    for line in lines:
+
+        line = line.strip()
+
+        if len(line) < 3:
+            continue
+
+        words = line.split()
+
+        if len(words) < 2:
+            continue
+
+        if line.upper() != line:
+            continue
+
+        valid = True
+
+        for word in ignore_words:
+
+            if word in line.upper():
+
+                valid = False
+
+                break
+
+        if valid:
+
+            name = line.title()
+
+            break
+
+    # -----------------------------
+    # Return Dictionary
+    # -----------------------------
+
+    return {
+
+        "name": name,
+
+        "dob": dob,
+
+        "licence": licence_number,
+
+        "full_text": full_text
+
+    }

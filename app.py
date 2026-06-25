@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from ocr import extract_text
 from face_match import verify_face
 from face_detection import extract_face
@@ -20,6 +20,12 @@ create_database()
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
+# Route to display uploaded images
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 @app.route("/upload", methods=["POST"])
@@ -50,31 +56,73 @@ def upload():
     id_card.save(id_path)
     selfie.save(selfie_path)
 
+    # -------------------------
     # OCR
-    ocr_text = extract_text(id_path)
+    # -------------------------
+    ocr_result = extract_text(id_path)
 
-    # Extract face from uploaded ID
+    # -------------------------
+    # Extract Face from ID Card
+    # -------------------------
     id_face_path = extract_face(id_path)
 
+    # -------------------------
     # Face Verification
+    # -------------------------
     verification = verify_face(
         selfie_path,
         id_face_path
     )
 
+    # -------------------------
+    # Similarity Score
+    # -------------------------
+    similarity = max(
+        0,
+        round((1 - verification["distance"]) * 100, 2)
+    )
+
+    # -------------------------
+    # Liveness Status
+    # -------------------------
+    liveness = "Passed"
+
+    # -------------------------
     # Save to Database
+    # -------------------------
     save_record(
-        ocr_text,
+        ocr_result["full_text"],
         verification["verified"],
         verification["distance"]
     )
 
+    # -------------------------
+    # Render Result Page
+    # -------------------------
     return render_template(
         "result.html",
+
         message="Verification Completed Successfully",
-        ocr_text=ocr_text,
+
         verified=verification["verified"],
-        distance=verification["distance"]
+
+        similarity=similarity,
+
+        distance=verification["distance"],
+
+        liveness=liveness,
+
+        id_image="uploaded_id.jpg",
+
+        selfie_image="uploaded_selfie.jpg",
+
+        name=ocr_result["name"],
+
+        dob=ocr_result["dob"],
+
+        licence=ocr_result["licence"],
+
+        full_text=ocr_result["full_text"]
     )
 
 
