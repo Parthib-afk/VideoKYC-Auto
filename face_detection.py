@@ -1,36 +1,51 @@
 import cv2
+import os
 
-cap = cv2.VideoCapture(0)
 
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades +
-    'haarcascade_frontalface_default.xml'
-)
+def extract_face(image_path):
 
-while True:
-    ret, frame = cap.read()
+    # Load image
+    image = cv2.imread(image_path)
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    if image is None:
+        raise Exception("Image not found.")
+
+    # Load Haar Cascade
+    face_cascade = cv2.CascadeClassifier(
+        cv2.data.haarcascades +
+        "haarcascade_frontalface_default.xml"
+    )
+
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     faces = face_cascade.detectMultiScale(
         gray,
         scaleFactor=1.1,
-        minNeighbors=5
+        minNeighbors=5,
+        minSize=(80, 80)
     )
 
-    for (x, y, w, h) in faces:
-        cv2.rectangle(
-            frame,
-            (x, y),
-            (x+w, y+h),
-            (0, 255, 0),
-            2
-        )
+    if len(faces) == 0:
+        raise Exception("No face found in ID Card.")
 
-    cv2.imshow("Face Detection", frame)
+    # Take the first detected face
+    (x, y, w, h) = faces[0]
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    face = image[y:y+h, x:x+w]
 
-cap.release()
-cv2.destroyAllWindows()
+    output_path = os.path.join(
+        "uploads",
+        "id_face.jpg"
+    )
+
+    cv2.imwrite(output_path, face)
+
+    return output_path
+
+
+# For testing only
+if __name__ == "__main__":
+
+    path = extract_face("uploads/uploaded_id.jpg")
+
+    print("Face saved at:", path)

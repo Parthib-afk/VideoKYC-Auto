@@ -1,14 +1,131 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Verification Result</title>
+    <title>Video KYC Result</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            margin:40px;
+            background:#f4f4f4;
+        }
+
+        .container{
+            width:700px;
+            margin:auto;
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0px 0px 10px gray;
+        }
+
+        h1{
+            text-align:center;
+            color:#2c3e50;
+        }
+
+        h2{
+            color:#2980b9;
+        }
+
+        pre{
+            background:#f8f8f8;
+            padding:15px;
+            border-radius:5px;
+            white-space:pre-wrap;
+        }
+
+        .success{
+            color:green;
+            font-size:20px;
+            font-weight:bold;
+        }
+
+        .failed{
+            color:red;
+            font-size:20px;
+            font-weight:bold;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        table td{
+            padding:10px;
+            border-bottom:1px solid #ddd;
+        }
+
+    </style>
+
 </head>
+
 <body>
 
-    <h1>{{ message }}</h1>
+<div class="container">
 
-    <img src="{{ url_for('static', filename=filename) }}"
-         width="400">
+<h1>VideoKYC Verification Result</h1>
+
+<h2>Status</h2>
+
+<p>{{ message }}</p>
+
+<hr>
+
+<h2>OCR Extracted Text</h2>
+
+<pre>{{ ocr_text }}</pre>
+
+<hr>
+
+<h2>Face Verification</h2>
+
+<table>
+
+<tr>
+<td><b>Verified</b></td>
+
+<td>
+
+{% if verified %}
+
+<span class="success">✔ VERIFIED</span>
+
+{% else %}
+
+<span class="failed">✘ NOT VERIFIED</span>
+
+{% endif %}
+
+</td>
+</tr>
+
+<tr>
+
+<td><b>Distance Score</b></td>
+
+<td>{{ distance }}</td>
+
+</tr>
+
+</table>
+
+<hr>
+
+<h2>Verification Summary</h2>
+
+<p>
+
+The uploaded ID card was processed using OCR and the uploaded selfie
+was compared with the face extracted from the ID card using DeepFace.
+
+</p>
+
+</div>
 
 </body>
+
 </html>
