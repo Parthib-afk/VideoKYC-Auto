@@ -1,226 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Video KYC Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoKYC-Auto — Verification Result</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
-body{
-    background:#eef3f9;
-    font-family:Arial,sans-serif;
-}
-.navbar{
-    background:#0d6efd;
-}
-.navbar-brand{
-    color:#fff!important;
-    font-weight:bold;
-}
-.card{
-    border:none;
-    border-radius:18px;
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-    margin-bottom:25px;
-}
-.card-header{
-    font-weight:bold;
-    font-size:1.1rem;
-    background:#fff;
-}
-.status{
-    text-align:center;
-    padding:20px;
-}
-.badge-status{
-    padding:12px 30px;
-    border-radius:30px;
-    font-size:18px;
-}
-.footer{
-    text-align:center;
-    color:#777;
-    margin:30px 0;
-}
-img{
-    border-radius:12px;
-    max-height:320px;
-    object-fit:contain;
-}
-pre{
-    white-space:pre-wrap;
-}
-</style>
+        :root {
+            --navy:      #0A1628;
+            --navy-mid:  #0F2044;
+            --card-bg:   #111D35;
+            --blue:      #2563EB;
+            --blue-light:#3B82F6;
+            --emerald:   #10B981;
+            --red:       #EF4444;
+            --slate-400: #94A3B8;
+            --slate-500: #64748B;
+            --white:     #FFFFFF;
+            --border:    rgba(255,255,255,0.07);
+        }
 
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--navy);
+            min-height: 100vh;
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            width: 100%;
+            background: var(--navy-mid);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar-brand { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--blue), var(--emerald));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .brand-name { font-size: 15px; font-weight: 700; }
+        .brand-tag  { font-size: 11px; color: var(--slate-400); letter-spacing:.08em; text-transform:uppercase; }
+        .topbar-badge {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: var(--emerald);
+            border: 1px solid rgba(16,185,129,.3);
+            padding: 5px 12px; border-radius: 20px;
+            background: rgba(16,185,129,.06);
+        }
+        .topbar-badge::before {
+            content:''; display:inline-block;
+            width:6px; height:6px;
+            background: var(--emerald); border-radius:50%;
+        }
+
+        /* ── WRAPPER ── */
+        .wrapper { width:100%; max-width:820px; padding:40px 20px 60px; }
+
+        /* ── STEP PROGRESS ── */
+        .steps { display:flex; align-items:center; justify-content:center; margin-bottom:36px; }
+        .step-item { display:flex; flex-direction:column; align-items:center; gap:6px; }
+        .step-circle {
+            width:36px; height:36px; border-radius:50%;
+            background:var(--emerald); border:2px solid var(--emerald);
+            display:flex; align-items:center; justify-content:center;
+            font-size:14px; font-weight:700; color:var(--white);
+        }
+        .step-label { font-size:11px; font-weight:500; color:var(--emerald); letter-spacing:.04em; text-transform:uppercase; }
+        .step-connector { width:80px; height:2px; background:var(--emerald); margin-bottom:22px; }
+
+        /* ── ANIMATIONS ── */
+        @keyframes badge-in { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
+        @keyframes fade-up  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── RESULT HERO ── */
+        .result-hero { text-align:center; margin-bottom:32px; }
+        .outcome-badge {
+            display:inline-flex; align-items:center; gap:10px;
+            padding:10px 24px; border-radius:40px;
+            font-size:14px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+            margin-bottom:20px; animation:badge-in .5s ease both;
+        }
+        .outcome-badge.passed { background:rgba(16,185,129,.12); border:1.5px solid rgba(16,185,129,.4); color:#6EE7B7; }
+        .outcome-badge.failed { background:rgba(239,68,68,.12);  border:1.5px solid rgba(239,68,68,.4);  color:#FCA5A5; }
+        .result-hero h1 { font-size:32px; font-weight:800; letter-spacing:-.02em; animation:fade-up .5s .1s ease both; }
+        .result-hero h1.passed { color:var(--emerald); }
+        .result-hero h1.failed { color:var(--red); }
+        .result-hero p  { font-size:15px; color:var(--slate-400); margin-top:10px; animation:fade-up .5s .2s ease both; }
+
+        /* ── CARDS GRID ── */
+        .cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; animation:fade-up .5s .25s ease both; }
+        @media(max-width:600px){ .cards-grid{ grid-template-columns:1fr; } }
+
+        .info-card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+        .info-card-header {
+            padding:16px 20px 12px; border-bottom:1px solid var(--border);
+            display:flex; align-items:center; gap:10px;
+        }
+        .card-icon {
+            width:34px; height:34px; border-radius:8px;
+            background:rgba(37,99,235,.12); border:1px solid rgba(37,99,235,.2);
+            display:flex; align-items:center; justify-content:center; font-size:16px;
+        }
+        .info-card-header h3 { font-size:13px; font-weight:700; }
+        .info-card-body { padding:18px 20px; }
+
+        /* ── FIELD ROWS ── */
+        .field-row { display:flex; align-items:flex-start; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+        .field-row:last-child { border-bottom:none; }
+        .field-key { font-size:12px; font-weight:500; color:var(--slate-400); text-transform:uppercase; letter-spacing:.05em; padding-top:2px; }
+        .field-val { font-size:14px; font-weight:600; color:var(--white); text-align:right; }
+
+        /* ── LIVENESS ── */
+        .liveness-result {
+            display:flex; align-items:center; gap:14px;
+            padding:16px; border-radius:12px; margin-top:6px;
+        }
+        .liveness-result.passed { background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.2); }
+        .liveness-result.failed { background:rgba(239,68,68,.08);  border:1px solid rgba(239,68,68,.2); }
+        .liveness-icon { font-size:28px; }
+        .liveness-text h4 { font-size:14px; font-weight:700; }
+        .liveness-text p  { font-size:12px; color:var(--slate-400); margin-top:2px; }
+        .liveness-badge { margin-left:auto; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+        .liveness-badge.passed { background:var(--emerald); color:var(--white); }
+        .liveness-badge.failed { background:var(--red);     color:var(--white); }
+
+        /* ── FACE COMPARE ── */
+        .card-full { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:16px; animation:fade-up .5s .3s ease both; }
+        .face-compare { display:flex; align-items:center; justify-content:center; gap:16px; padding:20px 0 10px; }
+        .face-img-wrap { text-align:center; }
+        .face-img-wrap img {
+            width:110px; height:110px; border-radius:50%; object-fit:cover;
+            border:3px solid var(--border); background:var(--navy);
+            display:block; margin:0 auto 8px;
+        }
+        .face-img-wrap img.match   { border-color:var(--emerald); box-shadow:0 0 0 4px rgba(16,185,129,.15); }
+        .face-img-wrap img.no-match{ border-color:var(--red);     box-shadow:0 0 0 4px rgba(239,68,68,.15); }
+        .img-label { font-size:11px; color:var(--slate-400); font-weight:500; text-transform:uppercase; letter-spacing:.05em; }
+        .compare-arrow { font-size:22px; color:var(--slate-500); }
+
+        /* ── SCORE BAR ── */
+        .match-score-row { display:flex; align-items:center; justify-content:space-between; margin-top:16px; gap:12px; }
+        .match-label { font-size:12px; color:var(--slate-400); text-transform:uppercase; font-weight:500; letter-spacing:.05em; white-space:nowrap; }
+        .score-bar-track { flex:1; height:6px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; }
+        .score-bar-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg, var(--blue), var(--emerald)); transition:width 1s ease; }
+        .score-value { font-size:14px; font-weight:700; white-space:nowrap; }
+
+        /* ── VERDICT ── */
+        .verdict-card { background:var(--card-bg); border-radius:16px; overflow:hidden; animation:fade-up .5s .35s ease both; }
+        .verdict-card.passed { border:1px solid rgba(16,185,129,.35); background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(37,99,235,.05)); }
+        .verdict-card.failed { border:1px solid rgba(239,68,68,.35);  background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(37,99,235,.05)); }
+        .verdict-body { display:flex; align-items:center; gap:20px; padding:24px 28px; flex-wrap:wrap; }
+        .verdict-icon { font-size:40px; flex-shrink:0; }
+        .verdict-text h2 { font-size:18px; font-weight:800; }
+        .verdict-text p  { font-size:13px; color:var(--slate-400); margin-top:4px; }
+        .verdict-actions { display:flex; gap:10px; margin-left:auto; flex-shrink:0; }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display:inline-flex; align-items:center; gap:8px;
+            padding:10px 20px; font-family:'Inter',sans-serif;
+            font-size:13px; font-weight:600; border:none; border-radius:10px;
+            cursor:pointer; text-decoration:none; transition:all .2s ease;
+        }
+        .btn-primary { background:var(--blue); color:var(--white); }
+        .btn-primary:hover { background:var(--blue-light); }
+        .btn-outline { background:transparent; color:var(--slate-400); border:1px solid var(--border); }
+        .btn-outline:hover { color:var(--white); border-color:var(--blue); }
+
+        /* ── FOOTER ── */
+        .security-note { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:32px; font-size:12px; color:var(--slate-500); animation:fade-up .5s .4s ease both; }
+
+    </style>
 </head>
 
 <body>
 
-<nav class="navbar">
-<div class="container">
-<a class="navbar-brand" href="#"><i class="fa-solid fa-id-card"></i> VideoKYC AI</a>
-</div>
-</nav>
-
-<div class="container mt-4">
-
-<div class="card">
-<div class="card-body status">
-
-{% if verified %}
-<span class="badge bg-success badge-status">
-<i class="fa-solid fa-circle-check"></i> VERIFIED
-</span>
-{% else %}
-<span class="badge bg-danger badge-status">
-<i class="fa-solid fa-circle-xmark"></i> FAILED
-</span>
-{% endif %}
-
-<h4 class="mt-3">{{ message }}</h4>
-
-</div>
+<div class="topbar">
+    <div class="topbar-brand">
+        <div class="logo-icon">🔐</div>
+        <div>
+            <div class="brand-name">VideoKYC Auto</div>
+            <div class="brand-tag">Identity Verification</div>
+        </div>
+    </div>
+    <div class="topbar-badge">Verification Complete</div>
 </div>
 
-<div class="card">
-<div class="card-header">
-<i class="fa-solid fa-images"></i> Uploaded Images
-</div>
+<div class="wrapper">
 
-<div class="card-body">
+    <!-- Steps (all done) -->
+    <div class="steps">
+        <div class="step-item">
+            <div class="step-circle">✓</div>
+            <div class="step-label">ID Scan</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item">
+            <div class="step-circle">✓</div>
+            <div class="step-label">Face Check</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item">
+            <div class="step-circle">✓</div>
+            <div class="step-label">Complete</div>
+        </div>
+    </div>
 
-<div class="row">
+    <!-- Hero -->
+    <div class="result-hero">
+        {% if verified %}
+            <div class="outcome-badge passed">✅ Verification Passed</div>
+            <h1 class="passed">Identity Confirmed</h1>
+            <p>Your identity has been successfully verified.</p>
+        {% else %}
+            <div class="outcome-badge failed">❌ Verification Failed</div>
+            <h1 class="failed">Verification Unsuccessful</h1>
+            <p>We could not verify your identity. Please try again.</p>
+        {% endif %}
+    </div>
 
-<div class="col-md-6 text-center">
-<h5>ID Card</h5>
-<img src="{{ url_for('uploaded_file', filename=id_image) }}" class="img-fluid">
-</div>
+    <!-- ID Details + Liveness -->
+    <div class="cards-grid">
 
-<div class="col-md-6 text-center">
-<h5>Live Selfie</h5>
-<img src="{{ url_for('uploaded_file', filename=selfie_image) }}" class="img-fluid">
-</div>
+        <div class="info-card">
+            <div class="info-card-header">
+                <div class="card-icon">🪪</div>
+                <h3>ID Document Details</h3>
+            </div>
+            <div class="info-card-body">
+                <div class="field-row">
+                    <span class="field-key">Name</span>
+                    <span class="field-val">{{ name }}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-key">Date of Birth</span>
+                    <span class="field-val">{{ dob }}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-key">Licence No.</span>
+                    <span class="field-val">{{ licence }}</span>
+                </div>
+            </div>
+        </div>
 
-</div>
+        <div class="info-card">
+            <div class="info-card-header">
+                <div class="card-icon">👁️</div>
+                <h3>Liveness Detection</h3>
+            </div>
+            <div class="info-card-body">
+                {% if liveness == "Passed" %}
+                <div class="liveness-result passed">
+                    <div class="liveness-icon">🟢</div>
+                    <div class="liveness-text">
+                        <h4>Real Person Detected</h4>
+                        <p>Live face confirmed via movement analysis.</p>
+                    </div>
+                    <div class="liveness-badge passed">Passed</div>
+                </div>
+                {% else %}
+                <div class="liveness-result failed">
+                    <div class="liveness-icon">🔴</div>
+                    <div class="liveness-text">
+                        <h4>Liveness Not Confirmed</h4>
+                        <p>Could not confirm live presence.</p>
+                    </div>
+                    <div class="liveness-badge failed">Failed</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
 
-</div>
-</div>
+    </div>
 
-<div class="card">
-<div class="card-header">
-<i class="fa-solid fa-file-lines"></i> OCR Details
-</div>
+    <!-- Face Comparison -->
+    <div class="card-full">
+        <div class="info-card-header">
+            <div class="card-icon">🔍</div>
+            <h3>Face Match Analysis</h3>
+        </div>
+        <div class="info-card-body">
+            <div class="face-compare">
+                <div class="face-img-wrap">
+                    <img src="/uploads/{{ id_image }}"
+                         alt="ID Photo"
+                         class="{{ 'match' if verified else 'no-match' }}">
+                    <div class="img-label">ID Photo</div>
+                </div>
+                <div class="compare-arrow">↔</div>
+                <div class="face-img-wrap">
+                    <img src="/uploads/{{ selfie_image }}"
+                         alt="Live Capture"
+                         class="{{ 'match' if verified else 'no-match' }}">
+                    <div class="img-label">Live Capture</div>
+                </div>
+            </div>
 
-<div class="card-body">
+            <div class="match-score-row">
+                <span class="match-label">Similarity Score</span>
+                <div class="score-bar-track">
+                    <div class="score-bar-fill" id="scoreBar" style="width:0%"></div>
+                </div>
+                <span class="score-value">{{ similarity }}%</span>
+            </div>
+        </div>
+    </div>
 
-<table class="table table-bordered">
+    <!-- Final Verdict -->
+    <div class="verdict-card {{ 'passed' if verified else 'failed' }}">
+        <div class="verdict-body">
+            <div class="verdict-icon">{{ '🛡️' if verified else '⚠️' }}</div>
+            <div class="verdict-text">
+                {% if verified %}
+                    <h2>KYC Verification Passed</h2>
+                    <p>All checks passed. This session has been recorded securely.</p>
+                {% else %}
+                    <h2>KYC Verification Failed</h2>
+                    <p>One or more checks failed. Please restart the process.</p>
+                {% endif %}
+            </div>
+            <div class="verdict-actions">
+                <a href="/" class="btn btn-outline">↩ Restart</a>
+                {% if verified %}
+                <button class="btn btn-primary" onclick="window.print()">🖨 Download Report</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-<tr>
-<th>Name</th>
-<td>{{ name }}</td>
-</tr>
-
-<tr>
-<th>Date of Birth</th>
-<td>{{ dob }}</td>
-</tr>
-
-<tr>
-<th>Licence Number</th>
-<td>{{ licence }}</td>
-</tr>
-
-</table>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="card-header">
-<i class="fa-solid fa-user-check"></i> Face Verification
-</div>
-
-<div class="card-body">
-
-<h5>Similarity Score : {{ similarity }}%</h5>
-
-<div class="progress" style="height:25px;">
-
-<div class="progress-bar bg-success"
-role="progressbar"
-style="width: {{ similarity }}%;">
-
-{{ similarity }}%
-
-</div>
-
-</div>
-
-<p class="mt-3">
-Distance Score :
-<strong>{{ distance }}</strong>
-</p>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="card-header">
-<i class="fa-solid fa-face-smile"></i> Liveness Detection
-</div>
-
-<div class="card-body">
-
-<div class="alert alert-success">
-{{ liveness }}
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="card-header">
-<i class="fa-solid fa-align-left"></i> Complete OCR Text
-</div>
-
-<div class="card-body">
-
-<pre>{{ full_text }}</pre>
-
-</div>
-
-</div>
-
-<div class="text-center">
-
-<a href="/" class="btn btn-primary btn-lg">
-<i class="fa-solid fa-rotate-left"></i>
-Verify Another
-</a>
-
-<button onclick="window.print()" class="btn btn-success btn-lg">
-<i class="fa-solid fa-download"></i>
-Download Report
-</button>
-
-</div>
-
-<div class="footer">
-
-© 2026 VideoKYC AI System
+    <div class="security-note">
+        🔒 &nbsp;All data is encrypted end-to-end and not retained after verification.
+    </div>
 
 </div>
 
-</div>
+<script>
+    window.addEventListener("load", () => {
+        const fill  = document.getElementById("scoreBar");
+        const score = parseFloat("{{ similarity }}") || 0;
+        setTimeout(() => { fill.style.width = Math.min(score, 100) + "%"; }, 300);
+    });
+</script>
 
 </body>
 </html>
